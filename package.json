@@ -1,0 +1,17 @@
+{
+  "name": "drive-s3-gateway",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev src/worker.ts",
+    "deploy": "wrangler deploy src/worker.ts",
+    "lint": "eslint src --ext .ts"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240329.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.4.0",
+    "wrangler": "^3.40.0"
+  }
+}
