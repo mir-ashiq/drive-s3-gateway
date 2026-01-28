@@ -4,7 +4,7 @@ export interface Env {
   GOOGLE_REFRESH_TOKEN: string;
   ACCESS_KEY: string;
   SECRET_KEY: string;
-  REGION: string;
+  REGION?: string;
   ALLOWED_BUCKETS?: string;
   AUTH_KV: KVNamespace;
   FOLDER_CACHE: KVNamespace;
@@ -23,6 +23,7 @@ const DRIVE_API = "https://www.googleapis.com/drive/v3";
 const DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3";
 
 const textEncoder = new TextEncoder();
+const DEFAULT_REGION = "auto";
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -393,9 +394,11 @@ async function resolveFileId(bucket: string, key: string, env: Env) {
 async function presignUrl(bucket: string, key: string, request: Request, env: Env) {
   const expiresIn = Number(new URL(request.url).searchParams.get("expires")) || 900;
   const url = new URL(request.url);
+  const scopeDateValue = scopeDate();
+  const region = env.REGION ?? DEFAULT_REGION;
   url.searchParams.delete("presign");
   url.searchParams.set("X-Amz-Algorithm", "AWS4-HMAC-SHA256");
-  url.searchParams.set("X-Amz-Credential", `${env.ACCESS_KEY}/${scopeDate()}/${env.REGION}/s3/aws4_request`);
+  url.searchParams.set("X-Amz-Credential", `${env.ACCESS_KEY}/${scopeDateValue}/${region}/s3/aws4_request`);
   url.searchParams.set("X-Amz-Date", amzDate());
   url.searchParams.set("X-Amz-Expires", expiresIn.toString());
   url.searchParams.set("X-Amz-SignedHeaders", "host");
@@ -411,11 +414,11 @@ async function presignUrl(bucket: string, key: string, request: Request, env: En
   const stringToSign = [
     "AWS4-HMAC-SHA256",
     url.searchParams.get("X-Amz-Date"),
-    `${scopeDate()}/${env.REGION}/s3/aws4_request`,
+    `${scopeDateValue}/${region}/s3/aws4_request`,
     await hashHex(canonicalRequest),
   ].join("\n");
 
-  const signingKey = await getSigningKey(env.SECRET_KEY, scopeDate(), env.REGION, "s3");
+  const signingKey = await getSigningKey(env.SECRET_KEY, scopeDateValue, region, "s3");
   const signature = await hmacHex(signingKey, stringToSign);
   url.searchParams.set("X-Amz-Signature", signature);
 

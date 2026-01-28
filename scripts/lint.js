@@ -9,7 +9,7 @@ if (!existsSync(eslintBin)) {
   process.exit(0);
 }
 
-const result = spawnSync(eslintBin, ["src", "--ext", ".ts"], { stdio: "inherit" });
+const result = spawnSync(eslintBin, ["src"], { stdio: "inherit" });
 if (result.status === 0) {
   process.exit(0);
 }
