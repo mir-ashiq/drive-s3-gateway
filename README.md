@@ -33,7 +33,7 @@ Add secrets with `wrangler secret put`:
 - `GOOGLE_REFRESH_TOKEN`
 - `ACCESS_KEY`
 - `SECRET_KEY`
-- `REGION` (use `auto` if you don't care)
+- `REGION` (optional; defaults to `auto`)
 - `ALLOWED_BUCKETS` (comma-separated list)
 
 ## Running locally
